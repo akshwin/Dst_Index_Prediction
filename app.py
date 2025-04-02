@@ -4,14 +4,13 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Load the trained model (Replace 'model.h5' with your actual model file)
-
 def load_trained_model():
     return load_model('model.h5')
 
 model = load_trained_model()
 
 # Define input features
-features = ['bx_gse', 'by_gse', 'bz_gse', 'theta_gse', 'phi_gse', 'bx_gsm', 'by_gsm', 'bz_gsm', 'theta_gsm', 'phi_gsm', 'bt', 'density', 'speed', 'temperature']
+features = ['dst_t-1', 'dst_t-2', 'dst_t-3', 'bz_gsm', 'theta_gsm', 'bz_gse', 'density', 'theta_gse', 'bx_gsm', 'bx_gse']
 
 st.set_page_config(page_title="Dst Prediction App", layout="wide")
 st.title("🌍 Dst Prediction App")
@@ -30,7 +29,6 @@ for i, feature in enumerate(features):
 
 # Add some spacing before the prediction button
 st.markdown("---")
-# st.markdown("### 🔮 Predict the Dst Value")
 
 # Predict Dst
 if st.button("Predict Dst", use_container_width=True):
