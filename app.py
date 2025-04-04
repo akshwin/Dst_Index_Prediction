@@ -113,16 +113,17 @@ def main():
     
     # Input fields
     
-    dst_t_1 = st.number_input("DST_t-1", value=0.0, format="%.2f")
-    dst_t_2 = st.number_input("DST_t-2", value=0.0, format="%.2f")
-    dst_t_3 = st.number_input("DST_t-3", value=0.0, format="%.2f")
-    bz_gsm = st.number_input("Bz_GSM", value=0.0, format="%.2f")
-    theta_gsm = st.number_input("Theta_GSM", value=0.0, format="%.2f")
-    bz_gse = st.number_input("Bz_GSE", value=0.0, format="%.2f")
-    density = st.number_input("Density", value=0.0, format="%.2f")
-    theta_gse = st.number_input("Theta_GSE", value=0.0, format="%.2f")
-    bx_gsm = st.number_input("Bx_GSM", value=0.0, format="%.2f")
-    bx_gse = st.number_input("Bx_GSE", value=0.0, format="%.2f")
+    dst_t_1 = float(st.text_input("DST_t-1", "0.0"))
+    dst_t_2 = float(st.text_input("DST_t-2", "0.0"))
+    dst_t_3 = float(st.text_input("DST_t-3", "0.0"))
+    bz_gsm = float(st.text_input("Bz_GSM", "0.0"))
+    theta_gsm = float(st.text_input("Theta_GSM", "0.0"))
+    bz_gse = float(st.text_input("Bz_GSE", "0.0"))
+    density = float(st.text_input("Density", "0.0"))
+    theta_gse = float(st.text_input("Theta_GSE", "0.0"))
+    bx_gsm = float(st.text_input("Bx_GSM", "0.0"))
+    bx_gse = float(st.text_input("Bx_GSE", "0.0"))
+
 
     result = ""
 
