@@ -122,7 +122,6 @@ def main():
     bx_gsm = float(st.text_input("Bx_GSM", "0.0"))
     bx_gse = float(st.text_input("Bx_GSE", "0.0"))
 
-
     result = ""
 
     # if st.button("Predict"):
