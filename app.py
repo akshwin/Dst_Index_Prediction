@@ -57,8 +57,6 @@ model.compile(optimizer=Adam(learning_rate=0.0005, clipvalue=1.0),  # Gradient c
               loss='mse',
               metrics=['mae'])
 
-print("Model loaded successfully!")
-    
 def classify_dst(dst_value):
     """Classify the DST value into categories."""
     if dst_value > -20:
