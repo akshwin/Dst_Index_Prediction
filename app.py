@@ -111,16 +111,16 @@ def main():
     
     # Input fields
     
-    dst_t_1 = float(st.text_input("DST_t-1", "0.0"))
-    dst_t_2 = float(st.text_input("DST_t-2", "0.0"))
-    dst_t_3 = float(st.text_input("DST_t-3", "0.0"))
-    bz_gsm = float(st.text_input("Bz_GSM", "0.0"))
-    theta_gsm = float(st.text_input("Theta_GSM", "0.0"))
-    bz_gse = float(st.text_input("Bz_GSE", "0.0"))
-    density = float(st.text_input("Density", "0.0"))
-    theta_gse = float(st.text_input("Theta_GSE", "0.0"))
-    bx_gsm = float(st.text_input("Bx_GSM", "0.0"))
-    bx_gse = float(st.text_input("Bx_GSE", "0.0"))
+    dst_t_1 = float(st.text_input("DST_t-1 (Lag feature 1)", "0.0"))
+    dst_t_2 = float(st.text_input("DST_t-2 (Lag feature 2)", "0.0"))
+    dst_t_3 = float(st.text_input("DST_t-3 (Lag feature 3)", "0.0"))
+    bz_gsm = float(st.text_input("Bz_GSM (Interplanetary-magnetic-field Y-component in GSM coordinate )", "0.0"))
+    theta_gsm = float(st.text_input("Theta_GSM (Interplanetary-magnetic-field latitude in GSM coordinates)", "0.0"))
+    bz_gse = float(st.text_input("(Bz_GSE Interplanetary-magnetic-field Z-component in GSE coordinate)", "0.0"))
+    density = float(st.text_input("Density(Solar wind proton density)", "0.0"))
+    theta_gse = float(st.text_input("Theta_GSE (Interplanetary-magnetic-field latitude in GSE coordinates)", "0.0"))
+    bx_gsm = float(st.text_input("Bx_GSM (Interplanetary-magnetic-field X-component in geocentric solar magnetospheric  coordinates)", "0.0"))
+    bx_gse = float(st.text_input("Bx_GSE(Interplanetary-magnetic-field X-component in geocentric solar ecliptic coordinates)", "0.0"))
 
     result = ""
 
