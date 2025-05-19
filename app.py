@@ -1,64 +1,53 @@
 import numpy as np
-import pickle
 import pandas as pd
 import streamlit as st
 from PIL import Image
 import tensorflow as tf
-from tensorflow.keras.models import Sequential,Model
-from tensorflow.keras.layers import Layer, Dense, Dropout, Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Layer, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import tensorflow.keras.backend as K
 
+# -------------------------------
+# Define Custom Quadratic Layer
+# -------------------------------
 class QuadraticLayer(Layer):
     def __init__(self, units, **kwargs):
         super(QuadraticLayer, self).__init__(**kwargs)
         self.units = units
 
     def build(self, input_shape):
-        self.W1 = self.add_weight(shape=(input_shape[-1], self.units), 
-                                  initializer="he_normal",  # More stable than Glorot
-                                  trainable=True)
-        self.W2 = self.add_weight(shape=(input_shape[-1], self.units), 
-                                  initializer="he_normal",  # Helps prevent exploding values
-                                  trainable=True)
+        self.W1 = self.add_weight(shape=(input_shape[-1], self.units), initializer="he_normal", trainable=True)
+        self.W2 = self.add_weight(shape=(input_shape[-1], self.units), initializer="he_normal", trainable=True)
         self.b = self.add_weight(shape=(self.units,), initializer="zeros", trainable=True)
 
     def call(self, inputs):
         quadratic_output = K.dot(inputs, self.W1) + K.dot(K.square(inputs), self.W2) + self.b
-        return K.clip(quadratic_output, -1e3, 1e3)  # Clip extreme values to prevent NaNs
+        return K.clip(quadratic_output, -1e3, 1e3)
 
-# Define input using Functional API
+# -------------------------------
+# Build Model
+# -------------------------------
 model = Sequential([
-    Dense(10, activation=None, input_shape=(10,)),  # Replacing Input() layer
-
+    Dense(10, activation=None, input_shape=(10,)),
     QuadraticLayer(128),
     Dropout(0.2),
-
     QuadraticLayer(64),
     Dropout(0.2),
-
     QuadraticLayer(32),
     Dropout(0.2),
-
     QuadraticLayer(16),
-
-    Dense(1)  # Output layer
+    Dense(1)
 ])
 
-# Define an adaptive learning rate scheduler
-lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, verbose=1, min_lr=1e-6)
+# Compile model
+model.compile(optimizer=Adam(learning_rate=0.0005, clipvalue=1.0), loss='mse', metrics=['mae'])
 
-# Early stopping to prevent overfitting
-early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True, verbose=1)
-
-# Compile the model with Adam optimizer and learning rate decay
-model.compile(optimizer=Adam(learning_rate=0.0005, clipvalue=1.0),  # Gradient clipping prevents explosion
-              loss='mse',
-              metrics=['mae'])
-
+# -------------------------------
+# Classification Function
+# -------------------------------
 def classify_dst(dst_value):
-    """Classify the DST value into categories."""
     if dst_value > -20:
         return "Quiet"
     elif -20 >= dst_value > -50:
@@ -70,70 +59,97 @@ def classify_dst(dst_value):
     else:
         return "Extreme Geomagnetic Storm"
 
+# -------------------------------
+# Prediction Function
+# -------------------------------
 def predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm, bz_gse, density, theta_gse, bx_gsm, bx_gse):
-    """Predicts the DST value using the trained model and classifies it."""
     try:
         input_data = np.array([[float(dst_t_1), float(dst_t_2), float(dst_t_3), float(bz_gsm),
                                 float(theta_gsm), float(bz_gse), float(density), float(theta_gse),
                                 float(bx_gsm), float(bx_gse)]])
-        
-        prediction = model.predict(input_data)[0][0]  # Extract scalar value
+        prediction = model.predict(input_data)[0][0]
         classification = classify_dst(prediction)
-        
         return prediction, classification
     except ValueError:
-        return "Error: Please enter valid numerical values", None
+        return "Error: Invalid input", None
 
-# Streamlit UI
+# -------------------------------
+# Streamlit App
+# -------------------------------
 def main():
-    html_temp = """
-    <div style="background-color:blue;padding:10px">
-    <h2 style="color:white;text-align:center;">DST Predictor</h2>
-    </div>
-    """
-    st.markdown(html_temp, unsafe_allow_html=True)
-    
-    # Sidebar Section
-    st.sidebar.header("About")
-    st.sidebar.info("The DST Predictor is an advanced AI application designed to predict the Disturbance Storm Time (DST) index.")
-    st.sidebar.info("This application utilizes Quadratic Neurons to generate accurate DST predictions.")
-    
-    # Adding classification table in sidebar
-    st.sidebar.markdown("""
-    | **DST Value (nT)**   | **Classification**            |
-    |----------------------|------------------------------|
-    | **> -20**           | Quiet                        |
-    | **-20 to -50**      | Unsettled                    |
-    | **-50 to -100**     | Moderate Storm               |
-    | **-100 to -200**    | Intense Storm                |
-    | **< -200**          | Extreme Geomagnetic Storm    |
-    """, unsafe_allow_html=True)
-    
-    # Input fields
-    
-    dst_t_1 = float(st.text_input("DST_t-1 (Lag feature 1)", "0.0"))
-    dst_t_2 = float(st.text_input("DST_t-2 (Lag feature 2)", "0.0"))
-    dst_t_3 = float(st.text_input("DST_t-3 (Lag feature 3)", "0.0"))
-    bz_gsm = float(st.text_input("Bz_GSM (Interplanetary-magnetic-field Y-component in GSM coordinate )", "0.0"))
-    theta_gsm = float(st.text_input("Theta_GSM (Interplanetary-magnetic-field latitude in GSM coordinates)", "0.0"))
-    bz_gse = float(st.text_input("(Bz_GSE Interplanetary-magnetic-field Z-component in GSE coordinate)", "0.0"))
-    density = float(st.text_input("Density(Solar wind proton density)", "0.0"))
-    theta_gse = float(st.text_input("Theta_GSE (Interplanetary-magnetic-field latitude in GSE coordinates)", "0.0"))
-    bx_gsm = float(st.text_input("Bx_GSM (Interplanetary-magnetic-field X-component in geocentric solar magnetospheric  coordinates)", "0.0"))
-    bx_gse = float(st.text_input("Bx_GSE(Interplanetary-magnetic-field X-component in geocentric solar ecliptic coordinates)", "0.0"))
+    st.set_page_config(page_title="DST Predictor", layout="centered", page_icon="🌌")
 
-    result = ""
+    # Sidebar with expandable info sections
+    with st.sidebar:
+        st.markdown("## 🌌 About the App")
+        st.markdown("""
+        This AI-powered application predicts the **Disturbance Storm Time (DST)** index using space weather data.  
+        DST is crucial for understanding geomagnetic storms that can impact satellites and power grids.
 
-    # if st.button("Predict"):
-    #     result = predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm, bz_gse, density, theta_gse, bx_gsm, bx_gse)
-    #     st.success(f"The output is: {result}")
-    
-    if st.button("Predict"):
-        predicted_dst, category = predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm, bz_gse, density, theta_gse, bx_gsm, bx_gse)
-    
-        if category:
-            st.success(f"The predicted DST value is: {predicted_dst:.2f}")
-            st.info(f"Classification: {category}")
-            
-if __name__ == '__main__':
+        **Model:** Custom Deep Neural Network with Quadratic Neurons  
+        **Metric:** Mean Squared Error (MSE)
+        """)
+        
+        with st.expander("📊 DST Classification Guide"):
+            st.table(pd.DataFrame({
+                "DST Range (nT)": ["> -20", "-20 to -50", "-50 to -100", "-100 to -200", "< -200"],
+                "Classification": ["Quiet", "Unsettled", "Moderate Storm", "Intense Storm", "Extreme Storm"]
+            }))
+
+        with st.expander("⚙️ Model Details"):
+            st.markdown("""
+            - **Network Architecture**: Custom model with **Quadratic Neurons**  
+            - **Optimizer**: Adam (learning rate: 0.0005)  
+            - **Loss Function**: Mean Squared Error (MSE)  
+            - **Metrics**: Mean Absolute Error (MAE)  
+            - **Training Dataset**: Based on space weather parameters for geomagnetic storm prediction.
+            """)
+        
+        with st.expander("📚 About the DST Index"):
+            st.markdown("""
+            The **Disturbance Storm Time (DST)** index measures the strength of geomagnetic storms.  
+            - **Quiet**: No geomagnetic storm activity.  
+            - **Unsettled**: Some geomagnetic activity.  
+            - **Moderate Storm**: More intense storm activity.  
+            - **Intense Storm**: Severe storm conditions.  
+            - **Extreme Storm**: Very severe geomagnetic storm, with potential for major disruptions.
+            """)
+
+        st.markdown("---")
+        st.markdown("👨‍💻 Developed by Akshwin T")
+        st.markdown("📬 Contact: [akshwint.2003@gmail.com](mailto:youremail@example.com)")
+
+    # Input form
+    st.markdown("<h1 style='text-align: center; color: #4A90E2;'>🌌 DST Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<h5 style='text-align: center;'>Powered by AI & Quadratic Neurons</h5>", unsafe_allow_html=True)
+
+    with st.form(key="dst_form"):
+        st.markdown("### 🔢 Input Parameters")
+        col1, col2 = st.columns(2)
+        with col1:
+            dst_t_1 = st.text_input("DST_t-1 (nT)", "0.0")
+            dst_t_2 = st.text_input("DST_t-2 (nT)", "0.0")
+            dst_t_3 = st.text_input("DST_t-3 (nT)", "0.0")
+            bz_gsm = st.text_input("Bz_GSM (nT)", "0.0")
+            theta_gsm = st.text_input("Theta_GSM (deg)", "0.0")
+        with col2:
+            bz_gse = st.text_input("Bz_GSE (nT)", "0.0")
+            density = st.text_input("Density (cm⁻³)", "0.0")
+            theta_gse = st.text_input("Theta_GSE (deg)", "0.0")
+            bx_gsm = st.text_input("Bx_GSM (nT)", "0.0")
+            bx_gse = st.text_input("Bx_GSE (nT)", "0.0")
+
+        submit_button = st.form_submit_button(label="🌠 Predict DST")
+
+    # Prediction result
+    if submit_button:
+        predicted_dst, classification = predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm,
+                                                    bz_gse, density, theta_gse, bx_gsm, bx_gse)
+        if classification:
+            st.success(f"🌟 **Predicted DST:** {predicted_dst:.2f} nT")
+            st.info(f"📊 **Classification:** {classification}")
+        else:
+            st.error(predicted_dst)
+
+if __name__ == "__main__":
     main()
