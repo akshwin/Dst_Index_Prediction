@@ -1,54 +1,154 @@
-# DST Prediction
+# 🌌 DST Predictor – Geomagnetic Storm Forecasting App
 
-## Overview
-This project aims to predict the **Dst (Disturbance Storm Time) index**, which measures geomagnetic activity, using an Artificial Neural Network (ANN) with quadratic neurons. The model leverages historical and real-time data to forecast geomagnetic disturbances that impact satellite communications, power grids, and GPS systems.
+An AI-powered web application that predicts the **Disturbance Storm Time (DST)** index using 10 space weather parameters. Built with **Streamlit**, powered by a custom **Quadratic Neural Network**, and optimized for real-time inference.
 
-## Features
-- **Data Preprocessing**: Handling missing values, feature selection, and correlation analysis.
-- **Lag Features**: Incorporating previous time step values (`dst_t-1`, `dst_t-2`, `dst_t-3`) to capture temporal dependencies.
-- **Feature Scaling**: Standardization using `StandardScaler` to improve model performance.
-- **Quadratic Layer**: A custom deep learning layer that enhances feature representation.
-- **ANN Model**: A deep learning model with multiple quadratic layers for robust learning.
-- **Training Enhancements**: Adaptive learning rate scheduler, early stopping, and dropout layers.
-- **Evaluation Metrics**: Mean Squared Error (MSE), Mean Absolute Error (MAE), and R-squared (R²).
-
-## Dataset
-The dataset includes multiple features related to space weather and geomagnetic activity, including:
-- **Solar Wind Parameters**: Velocity, density, IMF components
-- **Interplanetary Magnetic Field (IMF) Data**
-- **Historical Dst Index Values**
-
-## Installation
-Ensure you have Python 3.x installed along with the required dependencies. Install the necessary libraries using:
-```sh
-pip install numpy pandas matplotlib seaborn scikit-learn tensorflow
-```
-
-## Usage
-1. **Load the Dataset**: Import and preprocess the dataset, including handling missing values.
-2. **Feature Engineering**: Add lag features, drop irrelevant columns, and select the most correlated features.
-3. **Data Visualization**: Generate a heatmap to analyze feature correlation.
-4. **Model Training**:
-   - Use an ANN with custom `QuadraticLayer`.
-   - Apply dropout to prevent overfitting.
-   - Use early stopping and learning rate decay.
-5. **Evaluation**:
-   - Assess model performance using MSE, MAE, and R² metrics.
-   - Compare predictions with actual DST values.
-
-## Results
-- **Model Performance**:
-  - The ANN model with quadratic layers effectively captures complex dependencies.
-  - Lag features significantly improve prediction accuracy.
-- **Future Improvements**:
-  - Hyperparameter tuning to optimize model performance.
-  - Exploring LSTMs or Transformers for better temporal sequence modeling.
-
-## License
-This project is licensed under the MIT License.
+🌐 **Live Demo:**  
+[![Live Demo](https://img.shields.io/badge/Visit%20App-Click%20Here-blue?style=for-the-badge)](https://dst-predictor.streamlit.app/)
 
 ---
-**Contributors:** Akshwin T
 
-Feel free to contribute by improving the model or adding new features!
+## 🚀 Features
+
+- Predicts DST index based on past values and solar wind inputs.
+- Classifies space weather conditions into Quiet, Unsettled, or Storm categories.
+- Simple and interactive interface using Streamlit.
+- Visual display of input features and prediction results.
+- Backend powered by a custom deep learning model with quadratic neurons.
+
+---
+
+## 🧠 Model Architecture
+
+- **Input:** 10 space weather parameters  
+- **Hidden Layers:**  
+  - Dense (128) → Dropout  
+  - Quadratic Layer (64) → Dropout  
+  - Quadratic Layer (32) → Dropout  
+  - Dense (16) → Dropout  
+- **Output:** 1 neuron for DST prediction  
+- **Optimizer:** Adam (lr=0.0005)  
+- **Loss:** Mean Squared Error (MSE)  
+- **Metrics:** Mean Absolute Error (MAE)
+
+---
+
+## 🛠️ Tech Stack
+
+- Python 3.x
+- Streamlit
+- TensorFlow / Keras
+- NumPy, Pandas, Pillow
+- Matplotlib (optional)
+- Deployed on Streamlit Cloud
+
+---
+
+## 📁 Project Structure
+
+```
+
+dst-predictor/
+├── app.py
+├── model/
+│   └── dst\_model.h5
+├── utils/
+│   └── preprocess.py (optional)
+├── requirements.txt
+├── README.md
+└── ...
+
+````
+
+---
+
+## ⚙️ Local Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/dst-predictor.git
+cd dst-predictor
+````
+
+### 2. Set Up a Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate       # Mac/Linux
+venv\Scripts\activate          # Windows
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the App Locally
+
+```bash
+streamlit run app.py
+```
+
+Then open [http://localhost:8501](http://localhost:8501) in your browser.
+
+---
+
+## 🧾 Input Features
+
+| Feature    | Description               |
+| ---------- | ------------------------- |
+| DST\_t-1   | DST index 1 hour ago      |
+| DST\_t-2   | DST index 2 hours ago     |
+| DST\_t-3   | DST index 3 hours ago     |
+| Bz\_GSM    | IMF Bz in GSM coordinates |
+| Theta\_GSM | IMF clock angle in GSM    |
+| Bz\_GSE    | IMF Bz in GSE coordinates |
+| Density    | Solar wind density        |
+| Theta\_GSE | IMF clock angle in GSE    |
+| Bx\_GSM    | IMF Bx in GSM coordinates |
+| Bx\_GSE    | IMF Bx in GSE coordinates |
+
+---
+
+## 📊 Output Classification
+
+| DST Range (nT) | Classification |
+| -------------- | -------------- |
+| > -20          | Quiet          |
+| -20 to -50     | Unsettled      |
+| -50 to -100    | Moderate Storm |
+| -100 to -200   | Intense Storm  |
+| < -200         | Extreme Storm  |
+
+---
+
+## 📦 Requirements
+
+`requirements.txt` should include:
+
+```
+numpy
+pandas
+matplotlib
+keras
+tensorflow
+Pillow
+ipython
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🙋‍♂️ Author
+
+Made with 🌌 by **Akshwin T**
+🔗 [LinkedIn](https://www.linkedin.com/in/akshwin/) | [GitHub](https://github.com/akshwin)
+
+---
 
