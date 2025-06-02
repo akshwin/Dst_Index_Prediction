@@ -120,8 +120,10 @@ def main():
             """)
 
         st.markdown("---")
-        st.markdown("👨‍💻 Developed by **Akshwin T**")
+        st.markdown("👨‍💻 Developed by **Akshwin T, Ravin D, Vinay Deep Jaiswal**")
         st.markdown("📬 [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
+        st.markdown("📬 [ravind.2003@gmail.com](mailto:ravind.2003@gmail.com)")
+        st.markdown("📬 [vinaydeepjaiswal@gmail.com](mailto:vinaydeepjaiswal@gmail.com)")
 
     # Title
     st.markdown("<h1>🌌 DST Predictor</h1>", unsafe_allow_html=True)
