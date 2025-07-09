@@ -6,7 +6,6 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Layer, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import tensorflow.keras.backend as K
 
 # -------------------------------
@@ -78,54 +77,73 @@ def predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm, bz_gse, density, t
 def main():
     st.set_page_config(page_title="DST Predictor", layout="wide", page_icon="🌌")
 
-    # Custom Styling
+    # Theme-compatible minimal styling
     st.markdown("""
         <style>
-            .main { background-color: #f8f9fa; }
-            .stButton>button { background-color: #4A90E2; color: white; font-size: 16px; border-radius: 8px; }
-            .stTextInput>div>input { border-radius: 5px; }
-            .stMarkdown h1, .stMarkdown h5 { text-align: center; }
+            .stButton>button {
+                font-size: 16px;
+                border-radius: 8px;
+                padding: 6px 16px;
+            }
+            .stTextInput>div>input {
+                border-radius: 5px;
+            }
+            h1, h5 {
+                text-align: center;
+            }
+            .center-button {
+                display: flex;
+                justify-content: center;
+                margin-top: 1rem;
+            }
         </style>
     """, unsafe_allow_html=True)
 
-    # Sidebar
+    # Sidebar Info
     with st.sidebar:
         st.markdown("## 🌌 **DST Predictor Info**")
         st.markdown("""
-        - This AI-powered app forecasts the **Disturbance Storm Time (DST)** index to gauge geomagnetic storms.  
-        - Useful in satellite operations, power grids & space weather monitoring.
+        - Forecasts **Disturbance Storm Time (DST)** index using AI.  
+        - Useful for satellite ops, power grids & space weather tracking.
         """)
-
         st.markdown("---")
 
-        with st.expander("📊 **Classification Guide**"):
-            st.table(pd.DataFrame({
-                "DST Range (nT)": ["> -20", "-20 to -50", "-50 to -100", "-100 to -200", "< -200"],
-                "Classification": ["Quiet", "Unsettled", "Moderate Storm", "Intense Storm", "Extreme Storm"]
-            }))
+        st.markdown("### 📊 **Classification Guide**")
+        classification_data = pd.DataFrame({
+            "DST Range (nT)": ["> -20", "-20 to -50", "-50 to -100", "-100 to -200", "< -200"],
+            "Classification": [
+                "🟢 Quiet",
+                "🟢 Unsettled",
+                "🟠 Moderate Storm",
+                "🔴 Intense Storm",
+                "🔴 Extreme Storm"
+            ]
+        })
+        st.table(classification_data)
 
+        st.markdown("---")
         with st.expander("⚙️ **Model Details**"):
             st.markdown("""
-            - **Model Type**: DNN + Quadratic Neurons  
+            - **Model**: DNN + Quadratic Neurons  
             - **Optimizer**: Adam (LR: 0.0005)  
             - **Loss**: Mean Squared Error  
             - **Metric**: Mean Absolute Error  
-            - **Input Features**: 10 space weather parameters  
+            - **Inputs**: 10 space weather features  
             """)
 
         with st.expander("📚 **About DST**"):
             st.markdown("""
-            - The **DST Index** quantifies Earth's magnetic field deviation during geomagnetic storms.  
-            - A lower DST signifies stronger geomagnetic activity.
+            - DST quantifies Earth's magnetic field changes.  
+            - Lower values indicate stronger geomagnetic storms.
             """)
 
         st.markdown("---")
-        st.markdown("👨‍💻 Developed by **Akshwin T, Ravin D, Vinay Deep Jaiswal**")
+        st.markdown("👨‍💻 Built by **Akshwin T, Ravin D, Vinay Deep Jaiswal**")
         st.markdown("📬 [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
         st.markdown("📬 [ravind.2003@gmail.com](mailto:ravind.2003@gmail.com)")
         st.markdown("📬 [vinaydeepjaiswal@gmail.com](mailto:vinaydeepjaiswal@gmail.com)")
 
-    # Title
+    # Header
     st.markdown("<h1>🌌 DST Predictor</h1>", unsafe_allow_html=True)
     st.markdown("<h5>AI meets Space Weather | Powered by Quadratic Neurons</h5>", unsafe_allow_html=True)
 
@@ -145,9 +163,12 @@ def main():
             bx_gsm = st.text_input("Bx_GSM (nT)", "0.0")
             bx_gse = st.text_input("Bx_GSE (nT)", "0.0")
 
+        # Centered Predict Button
+        st.markdown('<div class="center-button">', unsafe_allow_html=True)
         submit_button = st.form_submit_button(label="🌠 Predict DST")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Output
+    # Output Section
     if submit_button:
         predicted_dst, classification = predict_dst(dst_t_1, dst_t_2, dst_t_3, bz_gsm, theta_gsm,
                                                     bz_gse, density, theta_gse, bx_gsm, bx_gse)
