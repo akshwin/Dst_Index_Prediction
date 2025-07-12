@@ -108,20 +108,19 @@ def main():
         """)
         st.markdown("---")
 
-        st.markdown("### 📊 **Classification Guide**")
-        classification_data = pd.DataFrame({
-            "DST Range (nT)": ["> -20", "-20 to -50", "-50 to -100", "-100 to -200", "< -200"],
-            "Classification": [
-                "🟢 Quiet",
-                "🟢 Unsettled",
-                "🟠 Moderate Storm",
-                "🔴 Intense Storm",
-                "🔴 Extreme Storm"
-            ]
-        })
-        st.table(classification_data)
+        with st.expander("📊 **Classification Guide**"):
+            classification_data = pd.DataFrame({
+                "DST Range (nT)": ["> -20", "-20 to -50", "-50 to -100", "-100 to -200", "< -200"],
+                "Classification": [
+                    "🟢 Quiet",
+                    "🟢 Unsettled",
+                    "🟠 Moderate Storm",
+                    "🔴 Intense Storm",
+                    "🔴 Extreme Storm"
+                ]
+            })
+            st.table(classification_data)
 
-        st.markdown("---")
         with st.expander("⚙️ **Model Details**"):
             st.markdown("""
             - **Model**: DNN + Quadratic Neurons  
